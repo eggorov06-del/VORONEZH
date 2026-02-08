@@ -1015,4 +1015,81 @@
             const profitEl = elements.profitPercent;
             profitEl.style.transition = 'all 0.5s';
             profitEl.style.transform = 'scale(1.2)';
+            profitEl.style.color = '#00ff41';
+            
+            setTimeout(() => {
+                profitEl.style.transform = 'scale(1)';
+            }, 500);
+            
+            setTimeout(() => {
+                profitEl.style.color = '#00d9ff';
+            }, 1000);
+        }
+        
+        // ОТКРЫТИЕ ВСЕХ БИРЖ
+        function openAllExchanges() {
+            updateStatus('OPENING EXCHANGES...', 'warning');
+            
+            let opened = 0;
+            const exchanges = Object.keys(CONFIG.exchangeLinks);
+            
+            exchanges.forEach((exchange, index) => {
+                setTimeout(() => {
+                    window.open(CONFIG.exchangeLinks[exchange], '_blank');
+                    opened++;
+                    
+                    if (opened === exchanges.length) {
+                        updateStatus(`ALL ${exchanges.length} EXCHANGES OPENED`, 'success');
+                    }
+                }, index * 300);
+            });
+        }
+        
+        // АВТОМАТИЧЕСКИЙ РЕЖИМ
+        function toggleAutoMode() {
+            autoMode = !autoMode;
+            
+            if (autoMode) {
+                elements.autoModeBtn.innerHTML = '🛑 STOP AUTO MODE';
+                elements.autoModeBtn.classList.remove('btn-danger');
+                elements.autoModeBtn.classList.add('btn-warning');
+                
+                updateStatus('AUTO MODE ACTIVATED - UPDATING EVERY 30 SECONDS', 'success');
+                
+                // Первое обновление
+                fetchAllPrices();
+                
+                // Интервал обновления
+                autoInterval = setInterval(() => {
+                    fetchAllPrices();
+                    updateStatus('AUTO UPDATE IN PROGRESS...', 'info');
+                }, 30000);
+            } else {
+                elements.autoModeBtn.innerHTML = '🤖 AUTO MODE';
+                elements.autoModeBtn.classList.remove('btn-warning');
+                elements.autoModeBtn.classList.add('btn-danger');
+                
+                clearInterval(autoInterval);
+                updateStatus('AUTO MODE DEACTIVATED', 'warning');
+            }
+        }
+        
+        // ЗАПУСК ПРИ ЗАГРУЗКЕ
+        document.addEventListener('DOMContentLoaded', init);
+        
+        // ДЛЯ IOS SAFARI
+        if (navigator.userAgent.match(/(iPhone|iPod|iPad)/i)) {
+            document.addEventListener('touchstart', function() {}, {passive: true});
+            
+            // Фикс для 100vh на iOS
+            function setVH() {
+                let vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+            setVH();
+            window.addEventListener('resize', setVH);
+        }
+    </script>
+</body>
+</html>
            
